@@ -1,0 +1,14 @@
+{
+  "domain_record": {
+    "id": 123456789,
+    "type": "A",
+    "name": "test",
+    "data": "1.2.3.4",
+    "priority": null,
+    "port": null,
+    "ttl": 3600,
+    "weight": null,
+    "flags": null,
+    "tag": null
+  }
+}

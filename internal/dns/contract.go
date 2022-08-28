@@ -1,17 +1,24 @@
 package dns
 
+import (
+	"context"
+
+	"github.com/agilenv/dns-dynamic-ip-updater/internal/dns/track"
+)
+
 //go:generate mockgen --package=dns --source=contract.go --destination=contract_mock.go DNSRecord,StatsRepository,PublicIP
 
 type DNSProvider interface {
-	GetRecord(name string) (string, error)
-	UpdateRecord(name string, ip string) error
+	GetRecord(ctx context.Context) (string, error)
+	UpdateRecord(ctx context.Context, ip string) error
 }
 
 type TrackRepository interface {
-	LastEvent() (interface{}, error)
-	Save(stats interface{}) error
+	LastEvent() track.Event
+	Save(event track.Event) error
 }
 
 type PublicIPAPI interface {
-	Get() (string, error)
+	Get(ctx context.Context) (string, error)
+	Name() string
 }

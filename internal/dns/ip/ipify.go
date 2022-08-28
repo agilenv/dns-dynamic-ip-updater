@@ -15,11 +15,13 @@ const (
 
 type ipify struct {
 	http *rest.Client
+	name string
 }
 
 func NewIpifyPublicIPAPI(http *rest.Client) *ipify {
 	return &ipify{
 		http: http,
+		name: "Ipify",
 	}
 }
 
@@ -36,4 +38,8 @@ func (i *ipify) Get(ctx context.Context) (string, error) {
 		return ip, nil
 	}
 	return "", fmt.Errorf("cannot get public ID from API")
+}
+
+func (i *ipify) Name() string {
+	return i.name
 }
