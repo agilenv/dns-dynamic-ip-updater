@@ -5,18 +5,22 @@ To achieve this, it provides commands to execute in a host computer and make the
 record has been created.
 
 ### Usage
+List available dns providers
+```
+linkip list providers
+```
 Search for IP changes and update DNS record
 ```
-linkip sync
+linkip sync --provider <provider> --env-file=/link/to/.env
 ```
 To avoid prompt for update confirmation
-```` 
-linkip sync --update yes
-````
+``` 
+linkip sync --provider <provider> --update yes --env-file=/link/to/.env
+```
 Show information about the last execution
-````bash
+```bash
 linkip status
-````
+```
 
 ## Integrations
 **Public IP API**
