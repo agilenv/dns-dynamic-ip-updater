@@ -21,12 +21,12 @@ type updater interface {
 func updateCMD(u updater) *cli.Command {
 	var confirm string
 	return &cli.Command{
-		Name:  "update",
-		Usage: "Search for IP changes and update a DNS record",
+		Name:  "sync",
+		Usage: "Search for IP changes and update DNS record",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "confirm",
-				Usage: "updates to dns record on provider [yes/no]",
+				Name:  "update",
+				Usage: "update to dns record on provider [yes/no]",
 				Value: "",
 
 				Destination: &confirm,
