@@ -12,7 +12,7 @@ import (
 )
 
 func buildUpdater() *dns.Updater {
-	trackFileStorage := track.NewFileStorage("tracks.log")
+	trackFileStorage := track.NewFileStorage()
 	IpifyAPI := publicip.NewIpifyPublicIPAPI(rest.NewClient())
 	digitaloceanDNSProvider, err := provider.NewDigitaloceanProvider(rest.NewClient())
 	if err != nil {
