@@ -9,7 +9,7 @@ func buildApp() *cli.App {
 
 	return &cli.App{
 		Name:  "linkip",
-		Usage: "Application that helps to synchronize a dynamic IP to a DNS record",
+		Usage: "Simple application to keep updated a dns record where the ip associated is dynamic",
 		Commands: []*cli.Command{
 			statusCMD(u),
 			updateCMD(u),
