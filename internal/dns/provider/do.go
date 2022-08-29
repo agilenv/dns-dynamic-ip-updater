@@ -39,10 +39,6 @@ type doResponse struct {
 	} `json:"domain_record"`
 }
 
-type doErrorResponse struct {
-	Msg string `json:"message"`
-}
-
 func NewDigitaloceanProvider(http *rest.Client) (*do, error) {
 	if err := doVars(); err != nil {
 		return nil, err
