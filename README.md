@@ -1,1 +1,1 @@
-# dns-dynamic-ip-updater
+# linkip
