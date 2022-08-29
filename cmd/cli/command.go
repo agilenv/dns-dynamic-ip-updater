@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -36,7 +35,7 @@ func updateCMD(u updater) *cli.Command {
 			ctx := context.Background()
 			changed, ip, err := u.SearchForChanges(ctx)
 			if err != nil {
-				return errors.New("an unexpected error occurred when fetching public IP address")
+				return err
 			}
 			if changed {
 				fmt.Fprintf(os.Stdout, "New public IP [%s] has founded\n", ip)
@@ -47,7 +46,7 @@ func updateCMD(u updater) *cli.Command {
 				}
 				if confirm == "yes" {
 					if err = u.Update(ctx, ip); err != nil {
-						return errors.New("cannot update DNS Record. [" + err.Error() + "]")
+						return err
 					}
 					fmt.Fprintf(os.Stdout, "Done!\n")
 					return nil
