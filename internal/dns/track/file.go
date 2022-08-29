@@ -8,15 +8,21 @@ import (
 )
 
 const (
-	timeLayout = time.RFC1123Z
-	delimiter  = "\t"
+	timeLayout         = time.RFC1123Z
+	delimiter          = "\t"
+	defaultFileStorage = "linkip_tracks.log"
+	fileEnvvar         = "TRACK_FILE"
 )
 
 type fileStorage struct {
 	filepath string
 }
 
-func NewFileStorage(filepath string) *fileStorage {
+func NewFileStorage() *fileStorage {
+	filepath := defaultFileStorage
+	if os.Getenv(fileEnvvar) != "" {
+		filepath = os.Getenv(fileEnvvar)
+	}
 	return &fileStorage{
 		filepath: filepath,
 	}
