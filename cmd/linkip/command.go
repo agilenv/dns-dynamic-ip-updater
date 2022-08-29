@@ -6,33 +6,34 @@ import (
 	"os"
 	"time"
 
-	"github.com/agilenv/linkip/internal/dns/track"
-
 	"github.com/urfave/cli/v2"
 )
 
-type updater interface {
-	SearchForChanges(ctx context.Context) (bool, string, error)
-	Update(ctx context.Context, ip string) error
-	LastExecution() *track.Event
-}
-
-func updateCMD(u updater) *cli.Command {
-	var confirm string
+func updateCMD() *cli.Command {
+	var (
+		confirm,
+		provider string
+	)
 	return &cli.Command{
 		Name:  "sync",
 		Usage: "Search for IP changes and update DNS record",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "update",
-				Usage: "update to dns record on provider [yes/no]",
-				Value: "",
-
+				Name:        "update",
+				Usage:       "update to dns record on provider [yes/no]",
+				Value:       "",
 				Destination: &confirm,
+			},
+			&cli.StringFlag{
+				Name:        "provider",
+				Usage:       "set dns provider to handle updates",
+				Value:       "digitalocean",
+				Destination: &provider,
 			},
 		},
 		Action: func(cCtx *cli.Context) error {
 			ctx := context.Background()
+			u := buildUpdater(provider)
 			changed, ip, err := u.SearchForChanges(ctx)
 			if err != nil {
 				return err
@@ -59,12 +60,31 @@ func updateCMD(u updater) *cli.Command {
 	}
 }
 
-func statusCMD(u updater) *cli.Command {
+func listCMD() *cli.Command {
+	return &cli.Command{
+		Name: "list",
+		Subcommands: []*cli.Command{
+			{
+				Name:  "providers",
+				Usage: "List available dns providers",
+				Action: func(cCtx *cli.Context) error {
+					for _, p := range availableDNSProviders {
+						fmt.Fprintf(os.Stdout, "%s\n", p)
+					}
+					return nil
+				},
+			},
+		},
+	}
+}
+
+func statusCMD() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
 		Usage: "Get information from last execution",
-		Action: func(ctx *cli.Context) error {
-			if event := u.LastExecution(); event != nil {
+		Action: func(cCtx *cli.Context) error {
+			s := buildFileStats()
+			if event := s.LastExecution(); event != nil {
 				fmt.Fprintf(os.Stdout, "\nLast Execution:\n\t%s\n", event.Time.Format(time.RFC850))
 				fmt.Fprintf(os.Stdout, "\nIP Address:\n\t%s\n", event.IP)
 				fmt.Fprintf(os.Stdout, "\nPublic IP API:\n\t%s\n", event.PublicAPI)

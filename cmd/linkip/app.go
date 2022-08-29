@@ -14,14 +14,30 @@ const (
 )
 
 func buildApp() *cli.App {
-	u := buildUpdater()
 	envFile := envFilepath
 	return &cli.App{
 		Name:  "linkip",
 		Usage: "Simple application to keep updated a dns record where the ip associated is dynamic",
 		Commands: []*cli.Command{
-			statusCMD(u),
-			updateCMD(u),
+			statusCMD(),
+			updateCMD(),
+			listCMD(),
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "env-file",
+				Usage:       "path to env file",
+				Destination: &envFile,
+				Value:       envFile,
+				HasBeenSet:  true,
+			},
+		},
+		Before: func(cCtx *cli.Context) error {
+			if err := godotenv.Load(envFile); err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err)
+				return errors.New("missing .env file. You can provide a file path with the flag --env-file")
+			}
+			return nil
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
