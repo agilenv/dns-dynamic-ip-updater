@@ -3,38 +3,46 @@ package dns
 import (
 	"context"
 
-	"github.com/agilenv/dns-dynamic-ip-updater/internal/dns/track"
+	"github.com/agilenv/linkip/internal/dns/track"
 )
 
-type updater struct {
+type Updater struct {
 	provider    DNSProvider
 	stats       TrackRepository
 	publicIPAPI PublicIPAPI
 }
 
-func NewUpdater(provider DNSProvider, stats TrackRepository, publicIPAPI PublicIPAPI) *updater {
-	return &updater{
+func NewUpdater(provider DNSProvider, stats TrackRepository, publicIPAPI PublicIPAPI) *Updater {
+	return &Updater{
 		provider:    provider,
 		stats:       stats,
 		publicIPAPI: publicIPAPI,
 	}
 }
 
-func (u *updater) Sync(ctx context.Context) error {
+func (u *Updater) SearchForChanges(ctx context.Context) (bool, string, error) {
 	event := u.stats.LastEvent()
 	publicIP, err := u.publicIPAPI.Get(ctx)
 	if err != nil {
-		return err
+		return false, "", err
 	}
-	return u.handleChanges(ctx, publicIP, event.IP)
+	if publicIP != event.IP {
+		return true, publicIP, nil
+	}
+	return false, event.IP, nil
 }
 
-func (u *updater) handleChanges(ctx context.Context, publicIP, lastSavedIP string) error {
-	if publicIP != lastSavedIP {
-		if err := u.provider.UpdateRecord(ctx, publicIP); err != nil {
-			return err
-		}
-		_ = u.stats.Save(track.Event{IP: publicIP, PublicAPI: u.publicIPAPI.Name()})
+func (u *Updater) Update(ctx context.Context, ip string) error {
+	if err := u.provider.UpdateRecord(ctx, ip); err != nil {
+		return err
+	}
+	_ = u.stats.Save(track.Event{IP: ip, PublicAPI: u.publicIPAPI.Name()})
+	return nil
+}
+
+func (u *Updater) LastExecution() *track.Event {
+	if e := u.stats.LastEvent(); e.IP != "" {
+		return &e
 	}
 	return nil
 }

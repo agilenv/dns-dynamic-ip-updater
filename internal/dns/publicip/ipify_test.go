@@ -1,4 +1,4 @@
-package ip
+package publicip
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/jarcoal/httpmock"
 
-	"github.com/agilenv/dns-dynamic-ip-updater/pkg/rest"
+	"github.com/agilenv/linkip/pkg/rest"
 )
 
 func successfulFakeResponse(t *testing.T) []byte {

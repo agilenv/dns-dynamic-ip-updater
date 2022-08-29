@@ -3,7 +3,7 @@ package dns
 import (
 	"context"
 
-	"github.com/agilenv/dns-dynamic-ip-updater/internal/dns/track"
+	"github.com/agilenv/linkip/internal/dns/track"
 )
 
 //go:generate mockgen --package=dns --source=contract.go --destination=contract_mock.go DNSRecord,StatsRepository,PublicIP

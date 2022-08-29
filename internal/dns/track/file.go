@@ -23,7 +23,7 @@ func NewFileStorage(filepath string) *fileStorage {
 }
 
 func (f *fileStorage) Save(event Event) error {
-	file, err := os.OpenFile(f.filepath, os.O_RDWR|os.O_CREATE, 0666)
+	file, err := os.OpenFile(f.filepath, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0666)
 	defer file.Close()
 	if err != nil {
 		return err

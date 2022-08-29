@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/agilenv/dns-dynamic-ip-updater/pkg/rest"
+	"github.com/agilenv/linkip/pkg/rest"
 )
 
 const (
