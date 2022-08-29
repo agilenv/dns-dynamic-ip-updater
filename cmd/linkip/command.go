@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-
 	"github.com/urfave/cli/v2"
 )
 
