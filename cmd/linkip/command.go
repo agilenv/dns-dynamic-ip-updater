@@ -6,18 +6,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/agilenv/linkip/internal/dns/track"
-
 	"github.com/urfave/cli/v2"
 )
 
-type updater interface {
-	SearchForChanges(ctx context.Context) (bool, string, error)
-	Update(ctx context.Context, ip string) error
-	LastExecution() *track.Event
-}
-
-func updateCMD(u updater) *cli.Command {
+func updateCMD() *cli.Command {
 	var confirm string
 	return &cli.Command{
 		Name:  "sync",
@@ -33,6 +25,7 @@ func updateCMD(u updater) *cli.Command {
 		},
 		Action: func(cCtx *cli.Context) error {
 			ctx := context.Background()
+			u := buildUpdater()
 			changed, ip, err := u.SearchForChanges(ctx)
 			if err != nil {
 				return err
@@ -59,12 +52,13 @@ func updateCMD(u updater) *cli.Command {
 	}
 }
 
-func statusCMD(u updater) *cli.Command {
+func statusCMD() *cli.Command {
 	return &cli.Command{
 		Name:  "status",
 		Usage: "Get information from last execution",
 		Action: func(ctx *cli.Context) error {
-			if event := u.LastExecution(); event != nil {
+			s := buildStats()
+			if event := s.LastExecution(); event != nil {
 				fmt.Fprintf(os.Stdout, "\nLast Execution:\n\t%s\n", event.Time.Format(time.RFC850))
 				fmt.Fprintf(os.Stdout, "\nIP Address:\n\t%s\n", event.IP)
 				fmt.Fprintf(os.Stdout, "\nPublic IP API:\n\t%s\n", event.PublicAPI)

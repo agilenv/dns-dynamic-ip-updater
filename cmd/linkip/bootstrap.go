@@ -11,13 +11,18 @@ import (
 	"github.com/agilenv/linkip/pkg/rest"
 )
 
-func buildUpdater() *dns.Updater {
+func buildStats() *dns.Stats {
 	trackFileStorage := track.NewFileStorage()
+	return dns.NewStats(trackFileStorage)
+}
+
+func buildUpdater() *dns.Updater {
+	stats := buildStats()
 	IpifyAPI := publicip.NewIpifyPublicIPAPI(rest.NewClient())
 	digitaloceanDNSProvider, err := provider.NewDigitaloceanProvider(rest.NewClient())
 	if err != nil {
 		log.Fatalf("%s", err)
 		os.Exit(1)
 	}
-	return dns.NewUpdater(digitaloceanDNSProvider, trackFileStorage, IpifyAPI)
+	return dns.NewUpdater(digitaloceanDNSProvider, stats, IpifyAPI)
 }

@@ -14,14 +14,13 @@ const (
 )
 
 func buildApp() *cli.App {
-	u := buildUpdater()
 	envFile := envFilepath
 	return &cli.App{
 		Name:  "linkip",
 		Usage: "Simple application to keep updated a dns record where the ip associated is dynamic",
 		Commands: []*cli.Command{
-			statusCMD(u),
-			updateCMD(u),
+			statusCMD(),
+			updateCMD(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
