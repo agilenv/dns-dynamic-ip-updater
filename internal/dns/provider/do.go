@@ -13,9 +13,9 @@ import (
 
 const (
 	doEndpoint       = "https://api.digitalocean.com/v2/domains/{{domain}}/records/{{record_id}}"
-	doDomainName     = "DOMAIN_NAME"
-	doDomainRecordID = "DOMAIN_RECORD_ID"
-	doToken          = "DIGITALOCEAN_TOKEN"
+	doDomainName     = "DO_DOMAIN_NAME"
+	doDomainRecordID = "DO_DOMAIN_RECORD_ID"
+	doToken          = "DO_TOKEN"
 )
 
 type do struct {

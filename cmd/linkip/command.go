@@ -6,12 +6,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
 )
 
 func updateCMD() *cli.Command {
 	var (
 		confirm,
+		envFile,
 		provider string
 	)
 	return &cli.Command{
@@ -27,12 +29,21 @@ func updateCMD() *cli.Command {
 			&cli.StringFlag{
 				Name:        "provider",
 				Usage:       "set dns provider to handle updates",
-				Value:       "digitalocean",
 				Destination: &provider,
+				Required:    true,
+			},
+			&cli.StringFlag{
+				Name:        "env-file",
+				Usage:       "path to env file",
+				Destination: &envFile,
+				Required:    true,
 			},
 		},
 		Action: func(cCtx *cli.Context) error {
 			ctx := context.Background()
+			if err := godotenv.Load(envFile); err != nil {
+				return err
+			}
 			u := buildUpdater(provider)
 			changed, ip, err := u.SearchForChanges(ctx)
 			if err != nil {
