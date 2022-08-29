@@ -39,6 +39,10 @@ type doResponse struct {
 	} `json:"domain_record"`
 }
 
+type doErrorResponse struct {
+	Msg string `json:"message"`
+}
+
 func NewDigitaloceanProvider(http *rest.Client) (*do, error) {
 	if err := doVars(); err != nil {
 		return nil, err
@@ -106,8 +110,26 @@ func (d *do) UpdateRecord(ctx context.Context, ip string) error {
 	if err != nil {
 		return err
 	}
+
 	if resp.StatusCode() != http.StatusOK {
-		return fmt.Errorf("cannot update dns record from provider")
+		return d.handleError(resp.StatusCode())
 	}
 	return nil
+}
+
+func (d *do) handleError(code int) error {
+	var s string
+	switch code {
+	case 401:
+		s = "Unauthorized. token appears to be invalid, are you sure it is correct?"
+	case 404:
+		s = "Resource not found. Are you sure domain name and domain record id environment variables are valid?"
+	case 429:
+		s = "API rate limit exceeded. There is a limitation on the number of request you can do in an hour."
+	case 500:
+		s = "Server error. Try again in a few minutes."
+	default:
+		s = "Unexpected error."
+	}
+	return fmt.Errorf("digital ocean => %s", s)
 }

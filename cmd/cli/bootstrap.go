@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/agilenv/linkip/internal/dns"
 	"github.com/agilenv/linkip/internal/dns/provider"
 	"github.com/agilenv/linkip/internal/dns/publicip"
@@ -13,7 +15,8 @@ func buildUpdater() *dns.Updater {
 	IpifyAPI := publicip.NewIpifyPublicIPAPI(rest.NewClient())
 	digitaloceanDNSProvider, err := provider.NewDigitaloceanProvider(rest.NewClient())
 	if err != nil {
-		panic(err)
+		log.Fatalf("%s", err)
+		return nil
 	}
 	return dns.NewUpdater(digitaloceanDNSProvider, trackFileStorage, IpifyAPI)
 }

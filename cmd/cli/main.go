@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	godotenv.Overload()
 	if err := buildApp().Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
