@@ -21,6 +21,7 @@ func buildApp() *cli.App {
 		Commands: []*cli.Command{
 			statusCMD(),
 			updateCMD(),
+			listCMD(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
