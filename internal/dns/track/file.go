@@ -41,7 +41,7 @@ func (f *fileStorage) Save(event Event) error {
 		event.PublicAPI,
 	}, delimiter)
 
-	_, err = file.WriteString(data)
+	_, err = file.WriteString(data + "\n")
 	if err != nil {
 		return err
 	}
