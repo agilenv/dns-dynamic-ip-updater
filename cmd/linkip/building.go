@@ -22,7 +22,11 @@ var (
 )
 
 func buildFileStats() *dns.Stats {
-	trackFileStorage := track.NewFileStorage()
+	filepath := os.Getenv(trackFilepath)
+	if filepath == "" {
+		filepath = "linkip_tracks.log"
+	}
+	trackFileStorage := track.NewFileStorage(filepath)
 	return dns.NewStats(trackFileStorage)
 }
 
@@ -32,11 +36,11 @@ func buildUpdater(dnsProvider string) *dns.Updater {
 	IpifyAPI := publicip.NewIpifyPublicIPAPI(rest.NewClient())
 	switch dnsProvider {
 	case digitalOceanProvider:
-		p, err := provider.NewDigitaloceanProvider(rest.NewClient())
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s", err)
-			os.Exit(1)
-		}
+		p := provider.NewDigitaloceanProvider(rest.NewClient(), provider.DigitaloceanConfig{
+			DomainName: os.Getenv(digitalOceanDomainName),
+			RecordID:   os.Getenv(digitalOceanRecordID),
+			Token:      os.Getenv(digitalOceanToken),
+		})
 		u = dns.NewUpdater(p, fileStats, IpifyAPI)
 	default:
 		fmt.Fprintf(os.Stderr, "invalid dns provider")

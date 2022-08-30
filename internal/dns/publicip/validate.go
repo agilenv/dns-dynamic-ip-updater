@@ -6,7 +6,7 @@ import (
 )
 
 func validate(ip string) error {
-	r, err := regexp.Compile("\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}\\b")
+	r, err := regexp.Compile(`\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b`)
 	if err != nil {
 		return err
 	}

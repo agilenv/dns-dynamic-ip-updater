@@ -5,28 +5,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/agilenv/linkip/pkg/rest"
 )
 
 const (
-	doEndpoint       = "https://api.digitalocean.com/v2/domains/{{domain}}/records/{{record_id}}"
-	doDomainName     = "DO_DOMAIN_NAME"
-	doDomainRecordID = "DO_DOMAIN_RECORD_ID"
-	doToken          = "DO_TOKEN"
+	doEndpoint = "https://api.digitalocean.com/v2/domains/{{domain}}/records/{{record_id}}"
 )
 
 type do struct {
 	http   *rest.Client
-	config doConfig
+	config DigitaloceanConfig
 }
 
-type doConfig struct {
-	domainName     string
-	domainRecordID string
-	token          string
+type DigitaloceanConfig struct {
+	DomainName string
+	RecordID   string
+	Token      string
 }
 
 type doUpdateRecord struct {
@@ -39,42 +35,19 @@ type doResponse struct {
 	} `json:"domain_record"`
 }
 
-type doErrorResponse struct {
-	Msg string `json:"message"`
-}
-
-func NewDigitaloceanProvider(http *rest.Client) (*do, error) {
-	if err := doVars(); err != nil {
-		return nil, err
-	}
+func NewDigitaloceanProvider(http *rest.Client, config DigitaloceanConfig) *do {
 	return &do{
-		http: http,
-		config: doConfig{
-			domainName:     os.Getenv(doDomainName),
-			domainRecordID: os.Getenv(doDomainRecordID),
-			token:          os.Getenv(doToken),
-		},
-	}, nil
-}
-
-func doVars() error {
-	names := []string{doDomainName, doDomainRecordID, doToken}
-	for _, envvar := range names {
-		_, ok := os.LookupEnv(envvar)
-		if !ok {
-			return fmt.Errorf("env var %s missing", envvar)
-		}
+		http:   http,
+		config: config,
 	}
-	return nil
 }
 
 func (d *do) GetRecord(ctx context.Context) (string, error) {
-	endpoint := strings.Replace(doEndpoint, "{{domain}}", os.Getenv(doDomainName), 1)
-	endpoint = strings.Replace(endpoint, "{{record_id}}", os.Getenv(doDomainRecordID), 1)
+	endpoint := prepareEndpoint(d.config.DomainName, d.config.RecordID)
 	resp, err := d.http.Do(rest.NewRequest(http.MethodGet, endpoint).
 		WithContext(ctx).
 		WithHeaders(map[string]string{
-			"Authorization": "Bearer " + os.Getenv(doToken),
+			"Authorization": "Bearer " + d.config.Token,
 		}),
 	)
 	if err != nil {
@@ -91,12 +64,11 @@ func (d *do) GetRecord(ctx context.Context) (string, error) {
 }
 
 func (d *do) UpdateRecord(ctx context.Context, ip string) error {
-	endpoint := strings.Replace(doEndpoint, "{{domain}}", os.Getenv(doDomainName), 1)
-	endpoint = strings.Replace(endpoint, "{{record_id}}", os.Getenv(doDomainRecordID), 1)
+	endpoint := prepareEndpoint(d.config.DomainName, d.config.RecordID)
 	resp, err := d.http.Do(rest.NewRequest(http.MethodPut, endpoint).
 		WithContext(ctx).
 		WithHeaders(map[string]string{
-			"Authorization": "Bearer " + os.Getenv(doToken),
+			"Authorization": "Bearer " + d.config.Token,
 		}).
 		WithBody(func() []byte {
 			body := &doUpdateRecord{Data: ip}
@@ -110,11 +82,16 @@ func (d *do) UpdateRecord(ctx context.Context, ip string) error {
 	if err != nil {
 		return err
 	}
-
 	if resp.StatusCode() != http.StatusOK {
 		return d.handleError(resp.StatusCode())
 	}
 	return nil
+}
+
+func prepareEndpoint(domain, recordID string) string {
+	endpoint := strings.Replace(doEndpoint, "{{domain}}", domain, 1)
+	endpoint = strings.Replace(endpoint, "{{record_id}}", recordID, 1)
+	return endpoint
 }
 
 func (d *do) handleError(code int) error {

@@ -12,7 +12,7 @@ import (
 
 func updateCMD() *cli.Command {
 	var (
-		confirm,
+		autoupdate bool
 		envFile,
 		provider string
 	)
@@ -20,11 +20,10 @@ func updateCMD() *cli.Command {
 		Name:  "sync",
 		Usage: "Search for IP changes and update DNS record",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "update",
-				Usage:       "update to dns record on provider [yes/no]",
-				Value:       "",
-				Destination: &confirm,
+			&cli.BoolFlag{
+				Name:        "auto-update",
+				Usage:       "auto update to dns record on provider [yes/no]",
+				Destination: &autoupdate,
 			},
 			&cli.StringFlag{
 				Name:        "provider",
@@ -49,19 +48,23 @@ func updateCMD() *cli.Command {
 			if err != nil {
 				return err
 			}
+			update := func() error {
+				if err = u.Update(ctx, ip); err != nil {
+					return err
+				}
+				fmt.Fprintf(os.Stdout, "Done!\n")
+				return nil
+			}
 			if changed {
 				fmt.Fprintf(os.Stdout, "New public IP [%s] has founded\n", ip)
-				if confirm == "" {
-					fmt.Fprintf(os.Stdout, "Do you want to update the dns record? [yes]: ")
-					confirm = "yes"
-					fmt.Scanf("%s", &confirm)
+				if autoupdate {
+					return update()
 				}
+				fmt.Fprintf(os.Stdout, "Do you want to update the dns record? [yes]: ")
+				confirm := "yes"
+				fmt.Scanf("%s", &confirm)
 				if confirm == "yes" {
-					if err = u.Update(ctx, ip); err != nil {
-						return err
-					}
-					fmt.Fprintf(os.Stdout, "Done!\n")
-					return nil
+					return update()
 				}
 				return nil
 			}

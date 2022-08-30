@@ -29,7 +29,7 @@ func Test_validate(t *testing.T) {
 		{
 			name:    "valid ip with spaces should pass validation",
 			args:    args{ip: "  192.123.0.204  "},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

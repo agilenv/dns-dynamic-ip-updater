@@ -1,6 +1,7 @@
 package track
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -8,21 +9,15 @@ import (
 )
 
 const (
-	timeLayout         = time.RFC1123Z
-	delimiter          = "\t"
-	defaultFileStorage = "linkip_tracks.log"
-	fileEnvvar         = "TRACK_FILE"
+	timeLayout = time.RFC1123Z
+	delimiter  = "\t"
 )
 
 type fileStorage struct {
 	filepath string
 }
 
-func NewFileStorage() *fileStorage {
-	filepath := defaultFileStorage
-	if os.Getenv(fileEnvvar) != "" {
-		filepath = os.Getenv(fileEnvvar)
-	}
+func NewFileStorage(filepath string) *fileStorage {
 	return &fileStorage{
 		filepath: filepath,
 	}
@@ -30,7 +25,11 @@ func NewFileStorage() *fileStorage {
 
 func (f *fileStorage) Save(event Event) error {
 	file, err := os.OpenFile(f.filepath, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0666)
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			fmt.Fprintf(os.Stdout, "%s", err)
+		}
+	}()
 	if err != nil {
 		return err
 	}
@@ -41,7 +40,7 @@ func (f *fileStorage) Save(event Event) error {
 		event.PublicAPI,
 	}, delimiter)
 
-	_, err = file.WriteString(data)
+	_, err = file.WriteString(data + "\n")
 	if err != nil {
 		return err
 	}
