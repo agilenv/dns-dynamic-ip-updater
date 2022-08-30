@@ -28,3 +28,5 @@ linkip status
 
 **DNS Providers**
 * DigitalOcean
+
+(link)[.env.example]
