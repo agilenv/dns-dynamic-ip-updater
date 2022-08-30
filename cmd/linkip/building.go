@@ -36,15 +36,11 @@ func buildUpdater(dnsProvider string) *dns.Updater {
 	IpifyAPI := publicip.NewIpifyPublicIPAPI(rest.NewClient())
 	switch dnsProvider {
 	case digitalOceanProvider:
-		p, err := provider.NewDigitaloceanProvider(rest.NewClient(), provider.DigitaloceanConfig{
+		p := provider.NewDigitaloceanProvider(rest.NewClient(), provider.DigitaloceanConfig{
 			DomainName: os.Getenv(digitalOceanDomainName),
 			RecordID:   os.Getenv(digitalOceanRecordID),
 			Token:      os.Getenv(digitalOceanToken),
 		})
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s", err)
-			os.Exit(1)
-		}
 		u = dns.NewUpdater(p, fileStats, IpifyAPI)
 	default:
 		fmt.Fprintf(os.Stderr, "invalid dns provider")

@@ -48,19 +48,23 @@ func updateCMD() *cli.Command {
 			if err != nil {
 				return err
 			}
+			update := func() error {
+				if err = u.Update(ctx, ip); err != nil {
+					return err
+				}
+				fmt.Fprintf(os.Stdout, "Done!\n")
+				return nil
+			}
 			if changed {
 				fmt.Fprintf(os.Stdout, "New public IP [%s] has founded\n", ip)
-				confirm := "yes"
-				if autoupdate == false {
-					fmt.Fprintf(os.Stdout, "Do you want to update the dns record? [yes]: ")
-					fmt.Scanf("%s", &confirm)
+				if autoupdate {
+					return update()
 				}
+				fmt.Fprintf(os.Stdout, "Do you want to update the dns record? [yes]: ")
+				confirm := "yes"
+				fmt.Scanf("%s", &confirm)
 				if confirm == "yes" {
-					if err = u.Update(ctx, ip); err != nil {
-						return err
-					}
-					fmt.Fprintf(os.Stdout, "Done!\n")
-					return nil
+					return update()
 				}
 				return nil
 			}

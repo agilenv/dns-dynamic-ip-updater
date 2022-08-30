@@ -1,6 +1,7 @@
 package track
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -24,7 +25,11 @@ func NewFileStorage(filepath string) *fileStorage {
 
 func (f *fileStorage) Save(event Event) error {
 	file, err := os.OpenFile(f.filepath, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0666)
-	defer file.Close()
+	defer func() {
+		if err = file.Close(); err != nil {
+			fmt.Fprintf(os.Stdout, "%s", err)
+		}
+	}()
 	if err != nil {
 		return err
 	}
