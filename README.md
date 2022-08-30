@@ -1,6 +1,6 @@
 # Linkip
 
-Linkip is a simple application to keep updated a dns record where the associated IP is dynamic, can be used in a cron expression to schedule executions periodically.
+Linkip is a simple application to keep updated a dns record where the associated IP is dynamic, it can be used in a cron expression to schedule periodic executions.
 
 Example
 ```
@@ -24,6 +24,11 @@ Show information about the last execution
 ```bash
 linkip status
 ```
+
+## Environment Variables
+Here is an example of an .env file with required variables in order to work properly.
+
+[link](.env.example)
 
 ## Integrations
 **Public IP API**
