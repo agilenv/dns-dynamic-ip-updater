@@ -12,7 +12,7 @@ import (
 
 func updateCMD() *cli.Command {
 	var (
-		confirm,
+		autoupdate bool
 		envFile,
 		provider string
 	)
@@ -20,11 +20,10 @@ func updateCMD() *cli.Command {
 		Name:  "sync",
 		Usage: "Search for IP changes and update DNS record",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "update",
-				Usage:       "update to dns record on provider [yes/no]",
-				Value:       "",
-				Destination: &confirm,
+			&cli.BoolFlag{
+				Name:        "auto-update",
+				Usage:       "auto update to dns record on provider [yes/no]",
+				Destination: &autoupdate,
 			},
 			&cli.StringFlag{
 				Name:        "provider",
@@ -51,9 +50,9 @@ func updateCMD() *cli.Command {
 			}
 			if changed {
 				fmt.Fprintf(os.Stdout, "New public IP [%s] has founded\n", ip)
-				if confirm == "" {
+				confirm := "yes"
+				if autoupdate == false {
 					fmt.Fprintf(os.Stdout, "Do you want to update the dns record? [yes]: ")
-					confirm = "yes"
 					fmt.Scanf("%s", &confirm)
 				}
 				if confirm == "yes" {
