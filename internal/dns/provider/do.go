@@ -35,16 +35,15 @@ type doResponse struct {
 	} `json:"domain_record"`
 }
 
-func NewDigitaloceanProvider(http *rest.Client, config DigitaloceanConfig) (*do, error) {
+func NewDigitaloceanProvider(http *rest.Client, config DigitaloceanConfig) *do {
 	return &do{
 		http:   http,
 		config: config,
-	}, nil
+	}
 }
 
 func (d *do) GetRecord(ctx context.Context) (string, error) {
-	endpoint := strings.Replace(doEndpoint, "{{domain}}", d.config.DomainName, 1)
-	endpoint = strings.Replace(endpoint, "{{record_id}}", d.config.RecordID, 1)
+	endpoint := prepareEndpoint(d.config.DomainName, d.config.RecordID)
 	resp, err := d.http.Do(rest.NewRequest(http.MethodGet, endpoint).
 		WithContext(ctx).
 		WithHeaders(map[string]string{
@@ -65,8 +64,7 @@ func (d *do) GetRecord(ctx context.Context) (string, error) {
 }
 
 func (d *do) UpdateRecord(ctx context.Context, ip string) error {
-	endpoint := strings.Replace(doEndpoint, "{{domain}}", d.config.DomainName, 1)
-	endpoint = strings.Replace(endpoint, "{{record_id}}", d.config.RecordID, 1)
+	endpoint := prepareEndpoint(d.config.DomainName, d.config.RecordID)
 	resp, err := d.http.Do(rest.NewRequest(http.MethodPut, endpoint).
 		WithContext(ctx).
 		WithHeaders(map[string]string{
@@ -84,11 +82,16 @@ func (d *do) UpdateRecord(ctx context.Context, ip string) error {
 	if err != nil {
 		return err
 	}
-
 	if resp.StatusCode() != http.StatusOK {
 		return d.handleError(resp.StatusCode())
 	}
 	return nil
+}
+
+func prepareEndpoint(domain, recordID string) string {
+	endpoint := strings.Replace(doEndpoint, "{{domain}}", domain, 1)
+	endpoint = strings.Replace(endpoint, "{{record_id}}", recordID, 1)
+	return endpoint
 }
 
 func (d *do) handleError(code int) error {
