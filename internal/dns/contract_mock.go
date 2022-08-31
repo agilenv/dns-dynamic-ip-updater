@@ -5,8 +5,10 @@
 package dns
 
 import (
+	context "context"
 	reflect "reflect"
 
+	track "github.com/agilenv/linkip/internal/dns/track"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -34,32 +36,32 @@ func (m *MockDNSProvider) EXPECT() *MockDNSProviderMockRecorder {
 }
 
 // GetRecord mocks base method.
-func (m *MockDNSProvider) GetRecord(name string) (string, error) {
+func (m *MockDNSProvider) GetRecord(ctx context.Context) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRecord", name)
+	ret := m.ctrl.Call(m, "GetRecord", ctx)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRecord indicates an expected call of GetRecord.
-func (mr *MockDNSProviderMockRecorder) GetRecord(name interface{}) *gomock.Call {
+func (mr *MockDNSProviderMockRecorder) GetRecord(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecord", reflect.TypeOf((*MockDNSProvider)(nil).GetRecord), name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecord", reflect.TypeOf((*MockDNSProvider)(nil).GetRecord), ctx)
 }
 
 // UpdateRecord mocks base method.
-func (m *MockDNSProvider) UpdateRecord(name, ip string) error {
+func (m *MockDNSProvider) UpdateRecord(ctx context.Context, ip string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateRecord", name, ip)
+	ret := m.ctrl.Call(m, "UpdateRecord", ctx, ip)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateRecord indicates an expected call of UpdateRecord.
-func (mr *MockDNSProviderMockRecorder) UpdateRecord(name, ip interface{}) *gomock.Call {
+func (mr *MockDNSProviderMockRecorder) UpdateRecord(ctx, ip interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRecord", reflect.TypeOf((*MockDNSProvider)(nil).UpdateRecord), name, ip)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRecord", reflect.TypeOf((*MockDNSProvider)(nil).UpdateRecord), ctx, ip)
 }
 
 // MockTrackRepository is a mock of TrackRepository interface.
@@ -86,12 +88,11 @@ func (m *MockTrackRepository) EXPECT() *MockTrackRepositoryMockRecorder {
 }
 
 // LastEvent mocks base method.
-func (m *MockTrackRepository) LastEvent() (interface{}, error) {
+func (m *MockTrackRepository) LastEvent() track.Event {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LastEvent")
-	ret0, _ := ret[0].(interface{})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(track.Event)
+	return ret0
 }
 
 // LastEvent indicates an expected call of LastEvent.
@@ -101,17 +102,17 @@ func (mr *MockTrackRepositoryMockRecorder) LastEvent() *gomock.Call {
 }
 
 // Save mocks base method.
-func (m *MockTrackRepository) Save(stats interface{}) error {
+func (m *MockTrackRepository) Save(event track.Event) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Save", stats)
+	ret := m.ctrl.Call(m, "Save", event)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Save indicates an expected call of Save.
-func (mr *MockTrackRepositoryMockRecorder) Save(stats interface{}) *gomock.Call {
+func (mr *MockTrackRepositoryMockRecorder) Save(event interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockTrackRepository)(nil).Save), stats)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockTrackRepository)(nil).Save), event)
 }
 
 // MockPublicIPAPI is a mock of PublicIPAPI interface.
@@ -138,16 +139,30 @@ func (m *MockPublicIPAPI) EXPECT() *MockPublicIPAPIMockRecorder {
 }
 
 // Get mocks base method.
-func (m *MockPublicIPAPI) Get() (string, error) {
+func (m *MockPublicIPAPI) Get(ctx context.Context) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get")
+	ret := m.ctrl.Call(m, "Get", ctx)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockPublicIPAPIMockRecorder) Get() *gomock.Call {
+func (mr *MockPublicIPAPIMockRecorder) Get(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockPublicIPAPI)(nil).Get))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockPublicIPAPI)(nil).Get), ctx)
+}
+
+// Name mocks base method.
+func (m *MockPublicIPAPI) Name() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Name")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Name indicates an expected call of Name.
+func (mr *MockPublicIPAPIMockRecorder) Name() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockPublicIPAPI)(nil).Name))
 }

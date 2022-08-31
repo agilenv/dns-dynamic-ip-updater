@@ -89,9 +89,7 @@ func Test_ipify_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &ipify{
-				http: tt.fields.http,
-			}
+			i := NewIpifyPublicIPAPI(rest.NewClient())
 			tt.expected(t, i.http)
 			got, err := i.Get(tt.args.ctx)
 			if (err != nil) != tt.wantErr {

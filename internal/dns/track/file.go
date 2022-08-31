@@ -33,7 +33,6 @@ func (f *fileStorage) Save(event Event) error {
 	if err != nil {
 		return err
 	}
-
 	data := strings.Join([]string{
 		time.Now().Format(timeLayout),
 		event.IP,
