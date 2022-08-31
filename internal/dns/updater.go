@@ -6,6 +6,8 @@ import (
 	"github.com/agilenv/linkip/internal/dns/track"
 )
 
+//go:generate mockgen --package=dns --source=updater.go --destination=updater_mock.go StatsUsecase
+
 type StatsUsecase interface {
 	Save(event track.Event) error
 	LastExecution() *track.Event
