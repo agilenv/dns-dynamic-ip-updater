@@ -66,7 +66,7 @@ func Test_fileStorage_LastEvent(t *testing.T) {
 	}{
 		{
 			name:   "should return a valid event from the tracks log",
-			fields: fields{filepath: "./testdata/tracks.log"},
+			fields: fields{filepath: "./testdata/log.log"},
 			want: func() Event {
 				time_, _ := time.Parse(timeLayout, "Mon, 29 Aug 2022 21:25:02 -0300")
 				event := NewEvent(time_, "1.2.3.4", "Test")
