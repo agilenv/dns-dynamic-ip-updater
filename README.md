@@ -1,5 +1,4 @@
 # Linkip
-[![Coverage Status](https://coveralls.io/repos/github/agilenv/linkip/badge.svg?branch=main)](https://coveralls.io/github/agilenv/linkip?branch=main)
 
 Linkip is a simple application to keep updated a dns record where the associated IP is dynamic, it can be used in a cron expression to schedule periodic executions.
 
